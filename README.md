@@ -13,7 +13,7 @@ An AI-powered appointment-booking system built with Vapi and n8n.
 
 ## Workflow overview
 
-![n8n workflow overview](workflow-overview.png 1.png)
+![n8n workflow overview](workflow-overview.png%201.png)
 
 
 
