@@ -1,0 +1,232 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "4305b8e3-b0b9-4bc6-8e7d-3ed07d36c9c8",
+        "options": {}
+      },
+      "id": "8d234bbc-bcc5-47f8-8768-cc4c5bfc0aa9",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "4305b8e3-b0b9-4bc6-8e7d-3ed07d36c9c8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eoc",
+              "leftValue": "={{ $json.body.message.type }}",
+              "rightValue": "end-of-call-report",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "has-audio",
+              "leftValue": "={{ $json.body.message.endedReason || \"\" }}",
+              "rightValue": "did-not-receive-customer-audio",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "4b63c5c2-5acf-479b-9df0-2dd2a6bfe4ff",
+      "name": "Only End-of-Call Reports",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1ai4xw_mttXQRKnTk-yStyYcBcXDqt1xyukUxn-iL0Z4",
+          "mode": "list",
+          "cachedResultName": "Call Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ai4xw_mttXQRKnTk-yStyYcBcXDqt1xyukUxn-iL0Z4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ai4xw_mttXQRKnTk-yStyYcBcXDqt1xyukUxn-iL0Z4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date/Time": "={{ $json.body.message.startedAt || $json.body.message.call?.createdAt || $now.toISO() }}",
+            "Customer": "={{ (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking Customer Name')?.result || {}).customerName || (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {})['Email Address'] || (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {}).customerName || (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {}).name || $json.body.message.customer?.number || '' }}",
+            "Type": "={{ (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {})['Appointment Type'] || (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {}).service || '' }}",
+            "Appointment": "={{ (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {}).AppointmentDateTime || (Object.values($json.body.message.artifact?.structuredOutputs || {}).find(o => o.name === 'Booking')?.result || {}).appointment || '' }}",
+            "Summary": "={{ $json.body.message.summary || $json.body.message.analysis?.summary || $json.body.message.artifact?.transcript || \"(no summary — call had no conversation, ended: \" + $json.body.message.endedReason + \")\" }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date/Time",
+              "displayName": "Date/Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer",
+              "displayName": "Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Type",
+              "displayName": "Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment",
+              "displayName": "Appointment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "f62aadca-fe64-4730-b7a8-ab529d588c22",
+      "name": "Append or update row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        48
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8GnU9yAJTaSnsX8N",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "akujiezefredinard@gmail.com",
+        "subject": "=New Call Log {{ $json.Customer }}",
+        "emailType": "text",
+        "message": "={{ $json.Summary }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        224
+      ],
+      "id": "e9626e8f-25c5-4f3f-a1d1-72b43fcf7908",
+      "name": "Send a message",
+      "webhookId": "cd5463d0-6dde-4e16-8f87-5815ff7ddb16",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IXxm3wNm5o7RNMxm",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Only End-of-Call Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only End-of-Call Reports": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9201d2d2-0305-437b-9912-8fcbf95f0fb2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "27825a69d591ba9637149bdf692af4bd4fb29f320edf7db38df7f77c89b3f983"
+  },
+  "nodeGroups": [],
+  "id": "EEVjabQCVbU4S7eD",
+  "tags": []
+}
