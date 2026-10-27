@@ -11,6 +11,12 @@ An AI-powered appointment-booking system built with Vapi and n8n.
 5. Vapi sends the end-of-call report to n8n.
 6. n8n adds the booking information to Google Sheets.
 
+## Workflow overview
+
+![n8n workflow overview](workflow-overview.png)
+
+
+
 ## Extracted fields
 
 - Customer name
